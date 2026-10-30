@@ -48,8 +48,6 @@
         modal: document.getElementById('modal-root'),
       };
       document.getElementById('btn-new').addEventListener('click', () => this.showSetup());
-      document.getElementById('btn-rules').addEventListener('click', () => this.openPage('rules.html'));
-      document.getElementById('btn-about').addEventListener('click', () => this.openPage('about.html'));
       this.settings = loadSettings() || {};
       this.dom.demo = document.getElementById('demo-controls');
       this.dom.bar = document.getElementById('actionbar');
@@ -156,6 +154,17 @@
       const modal = A.el('div', 'modal');
       modal.appendChild(A.el('h2', '', '新对局'));
       modal.appendChild(A.el('p', '', '每个座位可以单独设为「人类」或「AI」；全人类 = 热座，全 AI = 双机演示。'));
+
+      // 规则 / 声明放在主界面（设置界面）里：游戏中途不会因为点它们而丢局
+      const rowInfo = A.el('div', 'row');
+      rowInfo.appendChild(A.el('label', '', '说明'));
+      const rulesBtn = A.el('button', '', '规则');
+      rulesBtn.addEventListener('click', () => this.openPage('rules.html'));
+      const aboutBtn = A.el('button', '', '声明');
+      aboutBtn.addEventListener('click', () => this.openPage('about.html'));
+      rowInfo.appendChild(rulesBtn);
+      rowInfo.appendChild(aboutBtn);
+      modal.appendChild(rowInfo);
 
       const rowPlayers = A.el('div', 'row');
       rowPlayers.appendChild(A.el('label', '', '人数'));
@@ -272,6 +281,16 @@
       });
       rowStart.appendChild(go);
       modal.appendChild(rowStart);
+
+      // 万一是在对局中途打开设置：给一条"继续原来这局"的退路
+      if (this.started && this.game && !this.game.ended) {
+        const rowBack = A.el('div', 'row');
+        const back = A.el('button', 'primary', '继续当前对局');
+        back.addEventListener('click', () => this.closeModal());
+        rowBack.appendChild(back);
+        rowBack.appendChild(A.el('span', 'hint', '点「开始游戏」会放弃当前对局'));
+        modal.appendChild(rowBack);
+      }
 
       rebuildSeats();
       rebuildFirst();
