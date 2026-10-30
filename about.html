@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f1216">
+<title>声明 · Skyline 天际线</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="doc">
+  <a class="back" href="index.html">← 返回游戏</a>
+  <h1>声明与说明</h1>
+  <p class="lead">关于这个作品是什么、不是什么，以及它用到了哪些技术。</p>
+
+  <h2>一、这是一个"去背景化实现"</h2>
+  <p>本作品是对桌游 <strong>Skyline</strong>（天际线）的<strong>规则级复现</strong>：只保留公开的游戏规则与数据结构，
+     重新实现了引擎、界面、美术与文案。</p>
+  <ul>
+    <li><strong>不含任何原版素材</strong>：楼塔、骰子、图标全部由代码绘制（SVG / CSS），没有使用官方图片或美术资源。</li>
+    <li><strong>与版权方、发行方无关联</strong>，未获授权或背书。</li>
+    <li><strong>仅供学习与个人研究</strong>，不用于任何商业用途。</li>
+    <li>如果你喜欢这个游戏，请支持正版桌游。</li>
+  </ul>
+
+  <h2>二、使用了 AI 技术</h2>
+  <p>页面里的电脑对手不是脚本化的固定套路，而是搜索 + 学习得到的策略：</p>
+  <ul>
+    <li><strong>回合内精确搜索</strong>：把「这一回合怎么摆」算到期望最优（状态 = 盘面 × 骰面 × 是否已结算）。</li>
+    <li><strong>学出来的评估函数</strong>：用自对弈数据训练，预测"从这个盘面出发还能拿多少分"。</li>
+    <li><strong>取骰搜索</strong>：连"该拿哪三类骰子"也纳入同一个目标函数。</li>
+  </ul>
+  <p>这些模型是在本地训练的（只用于计算棋力，不收集任何数据，也不联网）。AI 生成的内容仅限棋力与界面代码，
+     文字说明由作者撰写。</p>
+
+  <h2>三、技术上是什么</h2>
+  <ul>
+    <li><strong>纯静态网页</strong>：原生 JavaScript，零依赖、无构建、无需服务器——双击 <code>index.html</code> 就能玩。</li>
+    <li><strong>可复现</strong>：骰子使用可播种的随机源，同一 seed 同一结果；规则引擎与训练用的 Python 引擎逐决策对拍一致。</li>
+    <li><strong>不联网</strong>：没有账号、没有埋点、没有远程请求。设置只存在你自己的浏览器里（localStorage）。</li>
+  </ul>
+
+  <h2>四、关于规则</h2>
+  <p>规则依据公开规则书与线上实测整理，其中"可以提前结束回合、剩余骰子退回工地"等细节都做过实机验证。
+     如果与官方规则有出入，以官方规则为准，并欢迎指出。</p>
+
+  <p class="foot">本页不构成任何法律意见；如涉及权利问题请联系作者处理。</p>
+  <a class="back" href="index.html">← 返回游戏</a>
+</div>
+</body>
+</html>

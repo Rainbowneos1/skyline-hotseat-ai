@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f1216">
+<title>规则 · Skyline 天际线</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="doc">
+  <a class="back" href="index.html">← 返回游戏</a>
+  <h1>怎么玩</h1>
+  <p class="lead">三分钟读完。所有示意图都是程序画的，和游戏里看到的一模一样。</p>
+
+  <h2>一句话</h2>
+  <p>掷骰子往自己的天际线上盖楼：紫（低层）、蓝（中层）、橙（高层）三色，楼必须自下而上一层层垒；
+     盖满一栋就换成楼块，<strong>分数 = 层数的平方</strong>。九轮之后分高者胜。</p>
+
+  <h2>一局的结构</h2>
+  <ul>
+    <li>共 <strong>9 轮</strong>，每轮每位玩家各走一个回合，顺序固定（轮与轮之间先手不变）。</li>
+    <li>开局按顺序赠送楼基：先手拿橙 <code>C</code>（要盖 6 层才成栋），第二家拿蓝 <code>B</code>，第三家拿紫 <code>A</code>，第四家拿不到。</li>
+  </ul>
+
+  <h2>一个回合</h2>
+  <ol>
+    <li><strong>取骰</strong>：从工地取 3 颗，类型可重复（地面 / 上层 / 顶层任意组合）；也可以<strong>拿光废弃区</strong>里的所有骰子。</li>
+    <li><strong>投掷</strong>：刚拿到的骰子必须<strong>全部掷一次</strong>。</li>
+    <li><strong>结算</strong>：至少用掉 1 颗（建造 / 弃置 / 拆除）。</li>
+    <li><strong>之后</strong>：可以重掷任意子集（每次重掷前仍要再结算一颗），也可以<strong>随时结束回合</strong>——剩下的骰子退回工地，不进废弃区。</li>
+  </ol>
+  <div class="callout">关键点：<strong>用掉一颗之后就能收手</strong>。手上剩的骰子不会送给对手。</div>
+
+  <h2>骰子与楼层</h2>
+  <div class="demo column" id="demo-dice"></div>
+  <p>每种骰子 6 个面，其中 <code>X</code> 是空白（只能弃置或拆除），<code>A</code> 是唯一能得分的未完成楼基（1 分）。
+     楼层必须按颜色从地面往上接：紫 <code>A→D</code>、蓝 <code>B→G/E→…</code>、橙 <code>C→F→H</code>。</p>
+
+  <h2>每颗面的概率</h2>
+  <p>每个面出现的概率都是 <strong>1/6</strong>，但每种面在骰子上占几面不同——下表由规则数据直接生成。</p>
+  <div class="demo column" id="demo-prob"></div>
+  <div class="callout">
+    三个「关键面」都只有 <strong>1/6</strong>：<code>C</code>（开橙楼）、<code>F</code>（橙楼加层）、<code>H</code>（橙楼封顶）。
+    取 3 颗同类骰，至少见到一次某个 1/6 面的概率是 <strong>1 − (5/6)³ ≈ 42%</strong>；
+    而 <code>X</code> 只出现在顶层骰里，占 3/6——所以顶层骰有 <strong>一半</strong> 的概率掷出空白。
+  </div>
+  <p>这也解释了为什么橙楼（高层）最难盖：一栋 6 层橙楼要连着见到 1 个 <code>C</code>、4 个 <code>F</code>、1 个 <code>H</code>，
+     每一个都是 1/6。</p>
+
+  <h2>建筑与计分</h2>
+  <div class="demo" id="demo-towers"></div>
+  <p>完成的楼按层数平方计分：1 层 1 分、2 层 4 分、3 层 9 分、4 层 16 分、5 层 25 分、6 层 36 分。</p>
+  <div class="demo" id="demo-tiles"></div>
+  <p>未完成的楼<strong>不算分</strong>，唯一的例外是孤零零的一层紫 <code>A</code>，折 1 分。</p>
+
+  <h2>废弃区</h2>
+  <div class="demo" id="demo-district"></div>
+  <p>你弃置的骰子会进废弃区。任何人可以「拿光废弃区」代替取 3 颗——但拿到后要<strong>全部重掷</strong>，
+     所以真正有用的是<strong>骰子数量</strong>（尤其多出来的那一两颗），而不是它们当前的面。</p>
+
+  <h2>终局</h2>
+  <ul>
+    <li>九轮打完，分高者胜；同分时<strong>完成栋数多</strong>的人赢，再相同则并列。</li>
+    <li>如果有人盖出 <strong>6 层楼</strong>，本轮打完就终局（"公平轮"：保证每人回合数相同）。</li>
+  </ul>
+
+  <h2>电脑难度</h2>
+  <p>六档，按本地自对弈的实测强弱排序：入门（随机）→ 简单（贪心）→ 普通（估值表）→
+     困难（回合内精确搜索）→ 专家（+ 线性估值）→ 大师（+ 取骰搜索）。每一档对下一档的胜率都写在选人界面上。</p>
+
+  <p class="foot">本页与游戏使用同一套渲染代码；页面不含任何第三方素材。</p>
+  <a class="back" href="index.html">← 返回游戏</a>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/art.js"></script>
+<script>
+(function () {
+  'use strict';
+  const D = SkyData, A = SkyArt;
+
+  // 骰子：三类的六个面
+  const diceBox = document.getElementById('demo-dice');
+  [0, 1, 2].forEach((t) => {
+    const col = A.el('div', 'tower');
+    col.appendChild(A.el('div', 'player-sub', D.TYPE_NAMES[t]));
+    const row = A.el('div', 'dice-row');
+    D.DICE_FACES[t].forEach((f) => row.appendChild(A.dieNode(f)));
+    col.appendChild(row);
+    diceBox.appendChild(col);
+  });
+
+  // 楼塔：三种典型状态
+  const towerBox = document.getElementById('demo-towers');
+  [D.COLUMN_INDEX.CFF, D.COLUMN_INDEX.BEE, D.TILE_BASE[2], D.TILE_BASE[6]].forEach((v) => {
+    const wrap = A.el('div', 'tower');
+    wrap.appendChild(A.towerNode(v));
+    wrap.appendChild(A.el('div', 'cap', D.describe(v)));
+    towerBox.appendChild(wrap);
+  });
+
+  // 楼块：1..6 层
+  const tileBox = document.getElementById('demo-tiles');
+  for (let h = 1; h <= 6; h += 1) {
+    const wrap = A.el('div', 'tower');
+    wrap.appendChild(A.tileNode(D.TILE_BASE[h]));
+    wrap.appendChild(A.el('div', 'cap', h + ' 层 · ' + h * h + ' 分'));
+    tileBox.appendChild(wrap);
+  }
+
+  // 概率：按类型列出每个面占几面
+  const probBox = document.getElementById('demo-prob');
+  [0, 1, 2].forEach((t) => {
+    const block = A.el('div', 'prob-block');
+    block.appendChild(A.el('div', 'player-sub', D.TYPE_NAMES[t]));
+    const row = A.el('div', 'dice-row');
+    const counts = {};
+    D.DICE_FACES[t].forEach((f) => { counts[f] = (counts[f] || 0) + 1; });
+    Object.keys(counts).sort((a, b) => counts[b] - counts[a]).forEach((face) => {
+      const cell = A.el('div', 'prob-cell');
+      cell.appendChild(A.dieNode(face));
+      cell.appendChild(A.el('div', 'cap', counts[face] + '/6 · '
+        + (Math.round((counts[face] / 6) * 1000) / 10) + '%'));
+      row.appendChild(cell);
+    });
+    block.appendChild(row);
+    probBox.appendChild(block);
+  });
+
+  // 废弃区
+  const districtBox = document.getElementById('demo-district');
+  D.DISTRICT_FILL.forEach((f) => districtBox.appendChild(A.dieNode(f)));
+  districtBox.appendChild(A.el('span', 'cap', '开局补满 3 颗；被拿光后立即补满'));
+})();
+</script>
+</body>
+</html>
