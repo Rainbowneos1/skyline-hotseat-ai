@@ -120,6 +120,10 @@
           this.selection = new Set([parseInt(sel, 10) || 0]);
           this.render();
         }
+        if (params.get('mode') === 'demolish' && this.selection.size) {
+          this.mode = 'demolish';
+          this.render();
+        }
         if (params.get('measure')) this.measure();
         return;
       }
@@ -448,14 +452,18 @@
       }
     },
 
-    /** 当前选中骰子能落在哪些槽位（含"新建"= 楼数）。 */
+    /** 当前可点击的槽位：建造时是"能落点"，拆除时是"任意一栋楼"。 */
     buildTargets() {
       const g = this.game;
       const out = new Set();
       if (!g || g.ended || g.phase !== E.RESOLVE || !this.selection.size) return out;
+      const board = g.buildings[g.current];
+      if (this.mode === 'demolish') {
+        for (let i = 0; i < board.length; i += 1) out.add(i);
+        return out;
+      }
       const die = Math.min(...this.selection);
       const face = g.dice[die];
-      const board = g.buildings[g.current];
       if (D.columnForFace(face) !== null) out.add(board.length);
       board.forEach((v, slot) => {
         if (D.extendColumn(v, face) !== null) out.add(slot);
@@ -658,8 +666,10 @@
       box.style.cssText = 'position:fixed;left:0;top:0;right:0;z-index:999;background:#000;color:#0f0;'
         + 'font:12px monospace;padding:6px;white-space:pre-wrap';
       box.textContent = '视口 ' + window.innerWidth + ' / 页面 ' + document.documentElement.scrollWidth
-        + ' | 动作栏 ' + barH + 'px / 留白 ' + pad + 'px' + (pad >= barH ? ' ✓不遮挡' : ' ✗遮挡') + '\n'
-        + rows.slice(0, 6).map((r) => r.join('  ')).join('\n');
+        + ' | 动作栏 ' + barH + 'px / 留白 ' + pad + 'px' + (pad >= barH ? ' ✓不遮挡' : ' ✗遮挡')
+        + ' | mode=' + (this.mode || '-') + ' sel=' + this.selection.size
+        + ' targets=' + this.buildTargets().size + '/楼' + (this.game ? this.game.buildings[this.game.current].length : 0)
+        + '\n' + rows.slice(0, 6).map((r) => r.join('  ')).join('\n');
       document.body.appendChild(box);
     },
 

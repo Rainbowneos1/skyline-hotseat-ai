@@ -57,7 +57,12 @@
         const tower = A.towerNode(entry.value);
         if (p === g.current && targets.has(entry.slot)) {
           tower.classList.add('target');
-          tower.title = '把选中的骰子放在这里';
+          if (app.mode === 'demolish') {
+            tower.classList.add('danger');
+            tower.title = '拆除这栋楼（骰子会弃到废弃区）';
+          } else {
+            tower.title = '把选中的骰子放在这里';
+          }
           tower.addEventListener('click', () => app.onTowerClick(entry.slot));
         }
         sky.appendChild(tower);
